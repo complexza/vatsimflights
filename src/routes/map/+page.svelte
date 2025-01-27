@@ -1,12 +1,31 @@
-<script>
+<script lang="ts">
 	import { onMount } from 'svelte';
 	import { get } from 'svelte/store';
+	import { airportStore, loadAirportsFromJSON } from '$lib/stores/airportStore';
 	import { vatsimData, fetchVatsimData } from '$lib/stores/vatsim';
 	import { mode } from 'mode-watcher';
 
 	let map, tileLayerLight, tileLayerDark;
 	let L;
 	let loading = true;
+	let controllers = get(vatsimData).controllers;
+	let controllerData = [];
+
+	const fetchControllerData = async () => {
+		await loadAirportsFromJSON();
+		const airports = get(airportStore).data;
+		controllerData = controllers.map((controller) => {
+			const icao = controller.callsign.substring(0, 4);
+			const airport = airports[icao];
+
+			return {
+				controller,
+				coordinates: airport
+					? { latitude: airport.latitude_deg, longitude: airport.longitude_deg }
+					: null
+			};
+		});
+	};
 
 	onMount(async () => {
 		if (typeof window !== 'undefined') {
@@ -19,6 +38,7 @@
 			document.head.appendChild(link);
 
 			await fetchVatsimData();
+			await fetchControllerData();
 
 			loading = false;
 
@@ -71,7 +91,28 @@
 				});
 			};
 
+			const renderCircles = () => {
+				controllerData.forEach((data) => {
+					if (data.coordinates) {
+						const { latitude, longitude } = data.coordinates;
+
+						L.circle([latitude, longitude], {
+							color: 'blue',
+							fillColor: 'red',
+							fillOpacity: 0.1,
+							radius: 5000
+						}).addTo(map).bindPopup(`
+							<strong>${data.controller.name}</strong><br />
+							Callsign: ${data.controller.callsign}<br />
+							Frequency: ${data.controller.frequency}<br />
+							Facility: ${data.controller.facility}
+						`);
+					}
+				});
+			};
+
 			renderMarkers();
+			renderCircles();
 
 			const unsubscribe = mode.subscribe((currentMode) => {
 				if (currentMode === 'dark') {
@@ -83,6 +124,7 @@
 				}
 
 				renderMarkers();
+				renderCircles();
 			});
 
 			return () => {
@@ -95,29 +137,31 @@
 
 <div class="relative h-full w-full">
 	{#if loading}
-	  <div class="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-zinc-800 z-10">
-		<div class="loader"></div>
-	  </div>
+		<div
+			class="absolute inset-0 z-10 flex items-center justify-center bg-gray-100 dark:bg-zinc-800"
+		>
+			<div class="loader"></div>
+		</div>
 	{/if}
 	<div id="map" class="h-full w-full"></div>
 </div>
 
 <style>
 	.loader {
-	  border: 4px solid #f3f3f3;
-	  border-top: 4px solid #181818;
-	  border-radius: 50%;
-	  width: 40px;
-	  height: 40px;
-	  animation: spin 1s linear infinite;
+		border: 4px solid #f3f3f3;
+		border-top: 4px solid #181818;
+		border-radius: 50%;
+		width: 40px;
+		height: 40px;
+		animation: spin 1s linear infinite;
 	}
-  
+
 	@keyframes spin {
-	  0% {
-		transform: rotate(0deg);
-	  }
-	  100% {
-		transform: rotate(360deg);
-	  }
+		0% {
+			transform: rotate(0deg);
+		}
+		100% {
+			transform: rotate(360deg);
+		}
 	}
-  </style>
+</style>

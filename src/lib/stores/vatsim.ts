@@ -8,28 +8,28 @@ export interface Pilot {
 	departure: string;
 	arrival: string;
 	position: [number, number];
-  name: string;
-  cid: number;
-  route: string;
+	name: string;
+	cid: number;
+	route: string;
 }
 
 export interface Controller {
-  name: string;
+	name: string;
 	callsign: string;
-  frequency: string;
-  facility: string
+	frequency: string;
+	facility: string;
 }
 
 interface VatsimDataState {
 	pilots: Pilot[];
-  controllers: Controller[];
+	controllers: Controller[];
 	loading: boolean;
 	error: string | null;
 }
 
 export const vatsimData = writable<VatsimDataState>({
 	pilots: [],
-  controllers: [],
+	controllers: [],
 	loading: true,
 	error: null
 });
@@ -37,7 +37,7 @@ export const vatsimData = writable<VatsimDataState>({
 export const fetchVatsimData = async (): Promise<void> => {
 	vatsimData.set({
 		pilots: [],
-    controllers: [],
+		controllers: [],
 		loading: true,
 		error: null
 	});
@@ -53,31 +53,31 @@ export const fetchVatsimData = async (): Promise<void> => {
 				departure: pilot.flight_plan?.departure || 'N/A',
 				arrival: pilot.flight_plan?.arrival || 'N/A',
 				position: [pilot.latitude, pilot.longitude],
-        name: pilot.name || 'N/A',
-        cid: pilot.cid || 'N/A',
-        route: pilot.flight_plan?.route || 'N/A'
+				name: pilot.name || 'N/A',
+				cid: pilot.cid || 'N/A',
+				route: pilot.flight_plan?.route || 'N/A'
 			})
 		);
 
-    const controllers = response.data.controllers.map(
+		const controllers = response.data.controllers.map(
 			(controller: any): Controller => ({
-        name: controller.name || 'N/A',
-        callsign: controller.callsign || 'N/A',
-        frequency: controller.frequency || 'N/A',
-        facility: controller.facility || 'N/A'
+				name: controller.name || 'N/A',
+				callsign: controller.callsign || 'N/A',
+				frequency: controller.frequency || 'N/A',
+				facility: controller.facility || 'N/A'
 			})
 		);
 
 		vatsimData.set({
 			pilots,
-      controllers,
+			controllers,
 			loading: false,
 			error: null
 		});
 	} catch (error) {
 		vatsimData.set({
 			pilots: [],
-      controllers: [],
+			controllers: [],
 			loading: false,
 			error: 'Failed to fetch VATSIM data'
 		});

@@ -72,22 +72,19 @@
 <Card.Root class="mb-4">
 	<Card.Header>
 		<div class="flex items-center justify-between">
-			<Card.Title>Vatsim Flights</Card.Title>
+			<Card.Title>Vatsim Flight Tracker</Card.Title>
 			<Button on:click={toggleMode} variant="outline" size="icon">
-        {#if $mode == 'dark'}
-				<Sun
-					class="h-[1.2rem] w-[1.2rem] transition-all"
-				/>
-        {:else}
-				<Moon
-					class="h-[1.2rem] w-[1.2rem] transition-all"
-				/>
-        {/if}
+				{#if $mode == 'dark'}
+					<Sun class="h-[1.2rem] w-[1.2rem] transition-all" />
+				{:else}
+					<Moon class="h-[1.2rem] w-[1.2rem] transition-all" />
+				{/if}
 				<span class="sr-only">Toggle theme</span>
 			</Button>
 		</div>
 		<Card.Description>
-			Track VATSIM flights, pilots, and controllers in real-time. View flight plans, monitor virtual traffic, and enhance situational awareness with this comprehensive VATSIM tracker."
+			Track VATSIM flights, pilots, and controllers in real-time. View flight plans, monitor virtual
+			traffic, and enhance situational awareness with this comprehensive VATSIM tracker.
 		</Card.Description>
 	</Card.Header>
 	<Card.Content>
