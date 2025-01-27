@@ -5,11 +5,20 @@
 	import Pilots from './pilots/+page.svelte';
 	import Map from './map/+page.svelte';
 	import { vatsimData, fetchVatsimData } from '$lib/stores/vatsim';
+	import * as Drawer from "$lib/components/ui/drawer";
+
+	export let title = "Vatsim Flight Tracker";
+    export let description = "Flight Monitoring and Tracking";
 
 	onMount(() => {
 		fetchVatsimData();
 	});
 </script>
+
+<svelte:head>
+    <title>{title}</title>
+    <meta name="description" content="{description}">
+</svelte:head>
 
 <ModeWatcher />
 
