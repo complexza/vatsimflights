@@ -11,6 +11,7 @@
 	import Moon from 'lucide-svelte/icons/moon';
 	import ArrowBigDown from 'lucide-svelte/icons/arrow-big-down';
 	import { toggleMode, mode } from 'mode-watcher';
+	import { Description } from '$lib/components/ui/alert';
 
 	let loading = true;
 	let searchTerm = '';
@@ -85,6 +86,9 @@
 				<span class="sr-only">Toggle theme</span>
 			</Button>
 		</div>
+		<Card.Description>
+			Track VATSIM flights, pilots, and controllers in real-time. View flight plans, monitor virtual traffic, and enhance situational awareness with this comprehensive VATSIM tracker."
+		</Card.Description>
 	</Card.Header>
 	<Card.Content>
 		<div class="flex flex-col items-start gap-2">
