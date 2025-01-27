@@ -4,11 +4,14 @@
 	import { onMount } from 'svelte';
 	import Pilots from './pilots/+page.svelte';
 	import Map from './map/+page.svelte';
-	import { vatsimData, fetchVatsimData } from '$lib/stores/vatsim';
-	import * as Drawer from "$lib/components/ui/drawer";
+	import { fetchVatsimData } from '$lib/stores/vatsim';
 
 	export let title = "Vatsim Flight Tracker";
     export let description = "Flight Monitoring and Tracking";
+
+	import { injectSpeedInsights } from '@vercel/speed-insights/sveltekit';
+
+	injectSpeedInsights();
 
 	onMount(() => {
 		fetchVatsimData();
