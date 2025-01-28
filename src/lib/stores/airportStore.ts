@@ -34,7 +34,7 @@ export const loadAirportsFromJSON = async (): Promise<void> => {
 		});
 
 		airportStore.set({ loading: false, error: null, data });
-		console.log('Loaded Airport', data.ident)
+
 	} catch (error) {
 		airportStore.set({ loading: false, error: error.message, data: {} });
 		console.error('Error loading airport data:', error);

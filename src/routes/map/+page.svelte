@@ -8,27 +8,45 @@
 	let map, tileLayerLight, tileLayerDark;
 	let L;
 	let loading = true;
-	let controllers = get(vatsimData).controllers;
-	let controllerData = [];
-
-	const fetchControllerData = async () => {
-		await loadAirportsFromJSON();
-		const airports = get(airportStore).data;
-		controllerData = controllers.map((controller) => {
-			const icao = controller.callsign.substring(0, 4);
-			const airport = airports[icao];
-
-			return {
-				controller,
-				coordinates: airport
-					? { latitude: airport.latitude_deg, longitude: airport.longitude_deg }
-					: null
-			};
-		});
-	};
+	let controllerData: any = [];
+	let controllers: any = [];
 
 	onMount(async () => {
 		if (typeof window !== 'undefined') {
+			await fetchVatsimData();
+
+			controllers = get(vatsimData).controllers;
+
+			const fetchControllerData = async () => {
+				await loadAirportsFromJSON();
+
+				const airports = get(airportStore).data;
+
+				if (!airports || Object.keys(airports).length === 0) {
+					return;
+				}
+
+				controllerData = controllers
+					.map((controller) => {
+						const icao = controller.callsign.substring(0, 4).trim();
+						const airport = airports[icao];
+						if (!airport) {
+							return null;
+						}
+
+						return {
+							controller,
+							coordinates: {
+								latitude: airport.latitude_deg,
+								longitude: airport.longitude_deg
+							}
+						};
+					})
+					.filter((data) => data !== null);
+			};
+
+			await fetchControllerData();
+
 			const leaflet = await import('leaflet');
 			L = leaflet.default;
 
@@ -36,11 +54,6 @@
 			link.rel = 'stylesheet';
 			link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
 			document.head.appendChild(link);
-
-			await fetchVatsimData();
-			await fetchControllerData();
-
-			loading = false;
 
 			map = L.map('map').setView([51.505, -0.09], 3);
 
@@ -113,6 +126,8 @@
 
 			renderMarkers();
 			renderCircles();
+
+			loading = false;
 
 			const unsubscribe = mode.subscribe((currentMode) => {
 				if (currentMode === 'dark') {
